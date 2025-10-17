@@ -7216,8 +7216,9 @@ MonoBehaviour:
   - {fileID: 1162319918}
   - {fileID: 1437153275}
   indexForward: 0
+  quality: Bravery
+  valueDisplay: {fileID: 1780947295}
   valueInput: {fileID: 815769359}
-  slideDuration: 0.5
 --- !u!33 &6345959051730395898
 MeshFilter:
   m_ObjectHideFlags: 0
