@@ -59,13 +59,19 @@ public class fxAbacus_mult : MonoBehaviour
         {
             valueDisplay.text = quality;
         }
-        
-       
     }
 
     public void ConfirmValue()
     {
-        int.TryParse(valueInput.text, out newValue);
+        if (valueInput.text == "true")
+        {
+            newValue = 10;
+        }
+        else
+        {
+            int.TryParse(valueInput.text, out newValue);
+        }
+
         valueInput.text = "";
         //Debug.Log (newValue);
     }
