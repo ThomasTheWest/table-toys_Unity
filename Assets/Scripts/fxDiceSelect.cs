@@ -15,34 +15,70 @@ public class fxDiceSelect : MonoBehaviour
 
     [Header("UI")]
     [SerializeField] private TMP_Text qualityPointsDisplay;
-    [SerializeField] private GameObject[] setupUI;
     [SerializeField] private GameObject rollingUI;
+    [SerializeField] private GameObject confirmDiceUI; // confirm your dice strength button
+    [SerializeField] private GameObject[] setupUI; //sticking UI stuff in arrays so the inspector isn't as cluttered 
+    [SerializeField] private GameObject[] rolledUI; // dice roll value UI elements
+    [SerializeField] private TMP_Text[] rolledTextUI; // dice roll values are displayed on these text bits. Might be redundant.
 
     [Header("Other")]
-    //private int qualityPointsMax = 9;
-    [HideInInspector] public int qualityPoints, qualityPointsB, qualityPointsW, qualityPointsC;
-    private int outB, outW, outC;
+    [SerializeField] private fxAbacus_mult[] abaci; // Abacus scripts that dice values are sent to
+    [SerializeField] private bool allowanceOn = false; // Decides if players get a base allowance per turn
+    [SerializeField] private int allowancePerTurn = 1; 
+    [SerializeField] private bool zeroesAllowed = true; // Decides if dice roll ranges start from 0 or 1
+    [SerializeField] private int qualityPointsLeft = 0; 
+    [SerializeField] private int actionsMax = 2;
 
-    [SerializeField] private fxAbacus_mult abacusB, abacusW, abacusC;
+    [HideInInspector] public int qualityPointsB, qualityPointsW, qualityPointsC;
+    private int[] output; // These are used by the dice roll coroutines to output values to be used by the abacus scripts.
+    private int actionCounter; // Max 2 
+    private bool diceSelected; // Just checks if you've confirmed your dice selection
+
     void Start()
     {
         rollingUI.SetActive(false);
 
         // Players are given three d6s (worth 3 quality pts) by default, leaving them with no spare quality pts to upgrade dice.
         // To get more they need to use DecreaseValue() to get more points to use on other dice
-        qualityPoints = 0;
+        qualityPointsLeft = 0;
         qualityPointsB = 3;
         qualityPointsW = 3;
         qualityPointsC = 3;
+
+        // This just clears UI elements displaying dice values that haven't been rolled yet
+        foreach (GameObject element in rolledUI)
+            element.SetActive(false);
+
+        // Since output[] is private, this just makes sure RollDice() knows it has 3 elements to write to
+        output = new int[4];
     }
+
     void Update()
     {
-        qualityPointsDisplay.text = "Quality Points remaining: " + (qualityPoints).ToString();
+        qualityPointsDisplay.text = "Quality Points remaining: " + (qualityPointsLeft).ToString();
+
+        // Once you choose 2 dice, you can roll again to get new values
+        if (actionCounter == actionsMax)
+        {
+            ConfirmDice();
+
+            foreach (GameObject element in rolledUI)
+                element.SetActive(false);
+
+            actionCounter = 0;
+        }
+
+        // Confirm button only appears if you've spent all your spare Quality Points
+        if (qualityPointsLeft == 0 && !diceSelected)
+            confirmDiceUI.SetActive(true);
+        else if (qualityPointsLeft != 0)
+            confirmDiceUI.SetActive(false);
     }
+
     public void IncreaseValue(int qualityIndex)
     {// When this is called by a UI button, the button should be set up with the right index. 0 is Bravery, 1 is Wit, 2 is Charm. 
 
-        if (qualityPoints != 0 && (qualityIndex == 0 && qualityPointsB != diceShape.Length - 1) || (qualityIndex == 1 && qualityPointsW != diceShape.Length - 1) || (qualityIndex == 2 && qualityPointsC != diceShape.Length - 1))
+        if (qualityPointsLeft != 0 && ((qualityIndex == 0 && qualityPointsB != diceShape.Length) || (qualityIndex == 1 && qualityPointsW != diceShape.Length) || (qualityIndex == 2 && qualityPointsC != diceShape.Length)))
         {
             MeshFilter currentFilter = qualityDice[qualityIndex].GetComponent<MeshFilter>();
 
@@ -54,7 +90,7 @@ public class fxDiceSelect : MonoBehaviour
             else if (qualityIndex == 2)
                 qualityPointsC++;
 
-            qualityPoints--;
+            qualityPointsLeft--;
 
             // This bit sets currentFilter up with the right dice model. The -1 is so qualityIndex matches up with the array order that starts at 0
             if (qualityIndex == 0)
@@ -79,7 +115,7 @@ public class fxDiceSelect : MonoBehaviour
             else if (qualityIndex == 2)
                 qualityPointsC--;
 
-            qualityPoints++;
+            qualityPointsLeft++;
 
             // Can probably move this to its own method and call it for both IncreaseValue() and DecreaseValue()
             if (qualityIndex == 0)
@@ -92,32 +128,66 @@ public class fxDiceSelect : MonoBehaviour
     }
 
     public void ConfirmDice()
-    {
+    {// Once you press the confirm button, you're locked into the dice you have and can now roll them
+
         foreach (GameObject element in setupUI)
-        {
             element.SetActive(false);
-        }
 
         rollingUI.SetActive(true);
+
+        diceSelected = true;
     }
 
     public void RollDice()
-    {// All three dice are rolled, giving a different range of values depending on what kind of dice they are
+    {// All three dice are rolled, giving a different range of values depending on what kind of dice they are. Called on UI button press
 
+        // First int for the Roll coroutine is for the quality type, second for the type of dice.
+        StartCoroutine(Roll(0, qualityPointsB));
+        StartCoroutine(Roll(1, qualityPointsW));
+        StartCoroutine(Roll(2, qualityPointsC));
+
+        if (allowanceOn)
+        {
+            abaci[0].TransmitPositiveValue(allowancePerTurn);
+            abaci[1].TransmitPositiveValue(allowancePerTurn);
+            abaci[2].TransmitPositiveValue(allowancePerTurn);
+        }
+
+        foreach (GameObject element in rolledUI)
+            element.SetActive(true);
+
+        rollingUI.SetActive(false);
     }
 
-    // Here be dice
-    private void RollResult(int resultB, int resultW, int resultC)
+    private IEnumerator Roll(int qualityIndex, int diceIndex)
     {
+        // diceIndex/qualityPointsX is equal to the dice value divided by two eg. diceIndex 3 corresponds to a d6
+        // As usual, qualityIndex 0 is Bravery, 1 is Wit, 2 is Charm
+        int roll;
 
-    }
-    private IEnumerator Rolld2(int qualityIndex)
-    {
-        int roll = UnityEngine.Random.Range(1, 2);
+        if (zeroesAllowed)
+            roll = UnityEngine.Random.Range(0, diceIndex * 2);
+        else
+            roll = UnityEngine.Random.Range(1, (diceIndex * 2) + 1);
 
-        if (qualityIndex == 0)
-            outB = 0;
+        output[qualityIndex] = roll;
+
+        rolledTextUI[qualityIndex].text = roll.ToString();
 
         yield return null;
+    }
+
+    public void ChooseDice(int qualityIndex)
+    {// Lets you select which dice to add to your abacus. Zeroes can't be selected as an action, so it just does nothing if you click those rolls
+
+        if (qualityIndex <= 2 && output[qualityIndex] != 0)
+        {
+            abaci[qualityIndex].TransmitPositiveValue(output[qualityIndex]);
+            rolledUI[qualityIndex].SetActive(false);
+        }        
+
+        //Since you can only select two dice max, there's a counter to make sure you're not selecting all three
+        if (output[qualityIndex] != 0 || qualityIndex > 2)
+            actionCounter++;
     }
 }

@@ -53,7 +53,7 @@ public class fxAbacus_mult : MonoBehaviour
     }
 
     public void ConfirmValue()
-    {// Called whenever the button in-scene is pressed.
+    {// Called whenever the confirm button in-scene is pressed, in conjuntion with the text input.
 
         if (valueInput.text == "true")
             newValue = beads.Length; //this is just a goof, don't worry about this
@@ -68,9 +68,30 @@ public class fxAbacus_mult : MonoBehaviour
         // add some code to clamp values to 0 - beads.Length
     }
 
-    public void TransmitValue(int transmitValue)
-    {
-        newValue += transmitValue;
+    public void TransmitPositiveValue(int transmitValue)
+    {// This is sort of a clamp function. Just makes sure the incoming value doesn't go higher than the amount of beads you have.
+
+        int checkValue;
+
+        checkValue = newValue + transmitValue;
+
+        if (checkValue > beads.Length)
+            newValue = beads.Length;
+        else
+            newValue += transmitValue;
+    }
+
+    public void TransmitNegativeValue(int transmitValue)
+    {// Would much prefer this and TransmitPositiveValue as a single function, but Unity button functions can only take two variables in-inspector. Grrrr.
+
+        int checkValue;
+
+        checkValue = newValue - transmitValue;
+
+        if (checkValue < 0)
+            newValue = 0;
+        else
+            newValue -= transmitValue;
     }
 
     private IEnumerator Slide(bool ToRight, int toMove) 
