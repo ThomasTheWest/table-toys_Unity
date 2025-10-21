@@ -7,7 +7,7 @@ using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
 using TMPro;
 
-public class fxAbacus_mult : MonoBehaviour
+public class fxAbacus_dice : MonoBehaviour
 {
     [Header("Arrays")]
     [SerializeField] private GameObject[] beads;
@@ -66,11 +66,6 @@ public class fxAbacus_mult : MonoBehaviour
 
         
         // add some code to clamp values to 0 - beads.Length
-    }
-
-    public void TransmitValue(int transmitValue)
-    {
-        newValue += transmitValue;
     }
 
     private IEnumerator Slide(bool ToRight, int toMove) 
