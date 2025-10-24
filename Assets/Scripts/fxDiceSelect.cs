@@ -26,7 +26,8 @@ public class fxDiceSelect : MonoBehaviour
     [SerializeField] private bool allowanceOn = false; // Decides if players get a base allowance per turn
     [SerializeField] private int allowancePerTurn = 1; 
     [SerializeField] private bool zeroesAllowed = true; // Decides if dice roll ranges start from 0 or 1
-    [SerializeField] private int qualityPointsLeft = 0; 
+    [SerializeField] private int qualityPointsLeft = 0;
+    private int qualityPointsMax; //This is the max smth can be, set in Start()
     [SerializeField] private int actionsMax = 2;
 
     [HideInInspector] public int qualityPointsB, qualityPointsW, qualityPointsC;
@@ -51,11 +52,13 @@ public class fxDiceSelect : MonoBehaviour
 
         // Since output[] is private, this just makes sure RollDice() knows it has 3 elements to write to
         output = new int[4];
+
+        qualityPointsMax = qualityPointsB + qualityPointsC + qualityPointsW + qualityPointsLeft;
     }
 
     void Update()
     {
-        qualityPointsDisplay.text = "Quality Points remaining: " + (qualityPointsLeft).ToString();
+        qualityPointsDisplay.text = "Quality Points remaining: " + qualityPointsLeft.ToString();
 
         // Once you choose 2 dice, you can roll again to get new values
         if (actionCounter == actionsMax)
@@ -73,6 +76,43 @@ public class fxDiceSelect : MonoBehaviour
             confirmDiceUI.SetActive(true);
         else if (qualityPointsLeft != 0)
             confirmDiceUI.SetActive(false);
+
+        // This bit just handles the dice up/downgrade buttons to disappear if they hit their max/min quality pts
+        // Check SetupUI[] for what this is setting in/active. ik it doesn't look pretty
+        if (!diceSelected)
+        {
+            Debug.Log(qualityPointsMax);
+            // This minus 2 is just the fact that if you want to max smth out, there's two points still assigned to the remaining d2s
+            if (qualityPointsB == qualityPointsMax - 2 || qualityPointsLeft == 0)
+                setupUI[0].SetActive(false);
+            else if (qualityPointsB < qualityPointsMax)
+                setupUI[0].SetActive(true);
+
+            if (qualityPointsB == 1)
+                setupUI[1].SetActive(false);
+            else if (qualityPointsB > 1)
+                setupUI[1].SetActive(true);
+
+            if (qualityPointsW == qualityPointsMax - 2 || qualityPointsLeft == 0)
+                setupUI[2].SetActive(false);
+            else if (qualityPointsW < qualityPointsMax)
+                setupUI[2].SetActive(true);
+
+            if (qualityPointsW == 1)
+                setupUI[3].SetActive(false);
+            else if (qualityPointsW > 1)
+                setupUI[3].SetActive(true);
+
+            if (qualityPointsC == qualityPointsMax - 2 || qualityPointsLeft == 0)
+                setupUI[4].SetActive(false);
+            else if (qualityPointsC < qualityPointsMax)
+                setupUI[4].SetActive(true);
+
+            if (qualityPointsC == 1)
+                setupUI[5].SetActive(false);
+            else if (qualityPointsC > 1)
+                setupUI[5].SetActive(true);
+        }
     }
 
     public void IncreaseValue(int qualityIndex)

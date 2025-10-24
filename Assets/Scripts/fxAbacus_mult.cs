@@ -126,7 +126,7 @@ public class fxAbacus_mult : MonoBehaviour
 
             //isSliding = false;
 
-            Debug.Log("indexForward: " + indexForward);
+            //Debug.Log("indexForward: " + indexForward);
         }
     }
 
