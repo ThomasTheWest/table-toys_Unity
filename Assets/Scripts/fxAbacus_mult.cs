@@ -24,10 +24,6 @@ public class fxAbacus_mult : MonoBehaviour
 
     private int oldValue = 0; // This value is compared to for any changes in qualityInput. Once the beads have moved, oldInput is set to qualityInput.
     private int newValue = 0; // This is an int converted from the string from numberInput.text
-
-    //private bool isSliding = false; // Defined to be true when we're in the routine to make the beads slide - used to end the coroutine
-    //Don't really need it anymore tbh
-    //[SerializeField] private float slideDuration = 0.5f; // Not a duration, an interpolation value for a vector3.lerp. 
     void Start()
     {
         indexMax = beads.Length - 1;
@@ -69,7 +65,7 @@ public class fxAbacus_mult : MonoBehaviour
     }
 
     public void TransmitPositiveValue(int transmitValue)
-    {// This is sort of a clamp function. Just makes sure the incoming value doesn't go higher than the amount of beads you have.
+    {// This is sort of a clamp function. Just makes sure the incoming value doesn't make the total higher than the amount of beads you have.
 
         int checkValue;
 
