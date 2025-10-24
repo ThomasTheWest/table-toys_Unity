@@ -9,16 +9,16 @@ using TMPro;
 
 public class fxDiceSelect : MonoBehaviour
 {
-    [Header("Arrays")]
+    [Header("Dice")]
     [SerializeField] GameObject[] qualityDice; // Lists the dice scene objects
     [SerializeField] Mesh[] diceShape; // This includes each dice type, 0 is d2, 1 is d4, 2 is d6, 3 is d8, 4 is d10, 5 is d12
 
     [Header("UI")]
-    [SerializeField] private TMP_Text qualityPointsDisplay;
-    [SerializeField] private GameObject rollingUI;
-    [SerializeField] private GameObject confirmDiceUI; // confirm your dice strength button
-    [SerializeField] private GameObject[] setupUI; //sticking UI stuff in arrays so the inspector isn't as cluttered 
-    [SerializeField] private GameObject[] rolledUI; // dice roll value UI elements
+    [SerializeField] private TMP_Text qualityPointsDisplay; // Header that displays your remaining quality points
+    [SerializeField] private GameObject rollingUI; // Button to roll dice
+    [SerializeField] private GameObject confirmDiceUI; // Button to confirm selected dice
+    [SerializeField] private GameObject[] setupUI; // Character building interface
+    [SerializeField] private GameObject[] rolledUI; // Interface for after you've rolled the dice
     [SerializeField] private TMP_Text[] rolledTextUI; // dice roll values are displayed on these text bits. Might be redundant.
 
     [Header("Other")]
@@ -26,9 +26,9 @@ public class fxDiceSelect : MonoBehaviour
     [SerializeField] private bool allowanceOn = false; // Decides if players get a base allowance per turn
     [SerializeField] private int allowancePerTurn = 1; 
     [SerializeField] private bool zeroesAllowed = true; // Decides if dice roll ranges start from 0 or 1
-    [SerializeField] private int qualityPointsLeft = 0;
+    [SerializeField] private int qualityPointsLeft = 0; // Right now, 3 d6es are the default character build, making 9 points the current max. Still leaving this here just in case we want to balance more.
     private int qualityPointsMax; //This is the max smth can be, set in Start()
-    [SerializeField] private int actionsMax = 2;
+    [SerializeField] private int actionsPerRound = 2; //Amount of actions players can take between regular rolls.
 
     [HideInInspector] public int qualityPointsB, qualityPointsW, qualityPointsC;
     private int[] output; // These are used by the dice roll coroutines to output values to be used by the abacus scripts.
@@ -37,10 +37,10 @@ public class fxDiceSelect : MonoBehaviour
 
     void Start()
     {
+        // Hides the button to roll dice before you've decided which ones you want
         rollingUI.SetActive(false);
 
         // Players are given three d6s (worth 3 quality pts) by default, leaving them with no spare quality pts to upgrade dice.
-        // To get more they need to use DecreaseValue() to get more points to use on other dice
         qualityPointsLeft = 0;
         qualityPointsB = 3;
         qualityPointsW = 3;
@@ -53,15 +53,17 @@ public class fxDiceSelect : MonoBehaviour
         // Since output[] is private, this just makes sure RollDice() knows it has 3 elements to write to
         output = new int[4];
 
+        //Adds up all points that exist in the system
         qualityPointsMax = qualityPointsB + qualityPointsC + qualityPointsW + qualityPointsLeft;
     }
 
     void Update()
     {
+        // Makes sure this updates the remaining quality points for player
         qualityPointsDisplay.text = "Quality Points remaining: " + qualityPointsLeft.ToString();
 
         // Once you choose 2 dice, you can roll again to get new values
-        if (actionCounter == actionsMax)
+        if (actionCounter == actionsPerRound)
         {
             ConfirmDice();
 
@@ -77,39 +79,39 @@ public class fxDiceSelect : MonoBehaviour
         else if (qualityPointsLeft != 0)
             confirmDiceUI.SetActive(false);
 
-        // This bit just handles the dice up/downgrade buttons to disappear if they hit their max/min quality pts
-        // Check SetupUI[] for what this is setting in/active. ik it doesn't look pretty
+        // This bit just sets the dice up/downgrade buttons to disappear if they hit their max/min quality pts
+        // Check SetupUI[] for what this is making (in)active. ik it doesn't look pretty
         if (!diceSelected)
         {
             Debug.Log(qualityPointsMax);
             // This minus 2 is just the fact that if you want to max smth out, there's two points still assigned to the remaining d2s
             if (qualityPointsB == qualityPointsMax - 2 || qualityPointsLeft == 0)
-                setupUI[0].SetActive(false);
+                setupUI[0].SetActive(false); //B+ button
             else if (qualityPointsB < qualityPointsMax)
                 setupUI[0].SetActive(true);
 
             if (qualityPointsB == 1)
-                setupUI[1].SetActive(false);
+                setupUI[1].SetActive(false); //B-
             else if (qualityPointsB > 1)
                 setupUI[1].SetActive(true);
 
             if (qualityPointsW == qualityPointsMax - 2 || qualityPointsLeft == 0)
-                setupUI[2].SetActive(false);
+                setupUI[2].SetActive(false); //W+ button
             else if (qualityPointsW < qualityPointsMax)
-                setupUI[2].SetActive(true);
+                setupUI[2].SetActive(true); 
 
             if (qualityPointsW == 1)
-                setupUI[3].SetActive(false);
-            else if (qualityPointsW > 1)
+                setupUI[3].SetActive(false); //W-
+            else if (qualityPointsW > 1) 
                 setupUI[3].SetActive(true);
 
             if (qualityPointsC == qualityPointsMax - 2 || qualityPointsLeft == 0)
-                setupUI[4].SetActive(false);
+                setupUI[4].SetActive(false); //C+ button
             else if (qualityPointsC < qualityPointsMax)
                 setupUI[4].SetActive(true);
 
             if (qualityPointsC == 1)
-                setupUI[5].SetActive(false);
+                setupUI[5].SetActive(false); //C-
             else if (qualityPointsC > 1)
                 setupUI[5].SetActive(true);
         }
