@@ -32,7 +32,7 @@ public class fxDiceSelect : MonoBehaviour
 
     [HideInInspector] public int qualityPointsB, qualityPointsW, qualityPointsC;
     private int[] output; // These are used by the dice roll coroutines to output values to be used by the abacus scripts.
-    private int actionCounter; // Max 2 
+    private int actionCounter; // 2 for now
     private bool diceSelected; // Just checks if you've confirmed your dice selection
 
     void Start()
@@ -83,7 +83,6 @@ public class fxDiceSelect : MonoBehaviour
         // Check SetupUI[] for what this is making (in)active. ik it doesn't look pretty
         if (!diceSelected)
         {
-            Debug.Log(qualityPointsMax);
             // This minus 2 is just the fact that if you want to max smth out, there's two points still assigned to the remaining d2s
             if (qualityPointsB == qualityPointsMax - 2 || qualityPointsLeft == 0)
                 setupUI[0].SetActive(false); //B+ button
@@ -190,9 +189,8 @@ public class fxDiceSelect : MonoBehaviour
 
         if (allowanceOn)
         {
-            abaci[0].TransmitPositiveValue(allowancePerTurn);
-            abaci[1].TransmitPositiveValue(allowancePerTurn);
-            abaci[2].TransmitPositiveValue(allowancePerTurn);
+            foreach (fxAbacus_mult element in abaci)
+                element.TransmitPositiveValue(allowancePerTurn);
         }
 
         foreach (GameObject element in rolledUI)
