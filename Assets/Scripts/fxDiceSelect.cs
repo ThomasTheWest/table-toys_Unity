@@ -8,7 +8,8 @@ using UnityEngine.UIElements;
 using TMPro;
 
 public class fxDiceSelect : MonoBehaviour
-{
+{// This script is attached to a manager in-scene and controls each Quality dice values and transmits rolls to abacus scripts.
+
     [Header("Dice")]
     [SerializeField] GameObject[] qualityDice; // Lists the dice scene objects
     [SerializeField] Mesh[] diceShape; // This includes each dice type, 0 is d2, 1 is d4, 2 is d6, 3 is d8, 4 is d10, 5 is d12
@@ -22,15 +23,15 @@ public class fxDiceSelect : MonoBehaviour
     [SerializeField] private TMP_Text[] rolledTextUI; // dice roll values are displayed on these text bits. Might be redundant.
 
     [Header("Other")]
-    [SerializeField] private fxAbacus_mult[] abaci; // Abacus scripts that dice values are sent to
-    [SerializeField] private bool allowanceOn = false; // Decides if players get a base allowance per turn
+    [SerializeField] private fxAbacus_mult[] abaci; // Abacus scripts in-scene that dice values are sent to
+    [SerializeField] private bool allowanceOn = false; // Decides if players get a base allowance to each of their Qualities per turn
     [SerializeField] private int allowancePerTurn = 1; 
     [SerializeField] private bool zeroesAllowed = true; // Decides if dice roll ranges start from 0 or 1
     [SerializeField] private int qualityPointsLeft = 0; // Right now, 3 d6es are the default character build, making 9 points the current max. Still leaving this here just in case we want to balance more.
-    private int qualityPointsMax; //This is the max smth can be, set in Start()
     [SerializeField] private int actionsPerRound = 2; //Amount of actions players can take between regular rolls.
 
-    [HideInInspector] public int qualityPointsB, qualityPointsW, qualityPointsC;
+    private int qualityPointsMax; //This is the max a Quality can be, set in Start()
+    private int qualityPointsB, qualityPointsW, qualityPointsC;
     private int[] output; // These are used by the dice roll coroutines to output values to be used by the abacus scripts.
     private int actionCounter; // 2 for now
     private bool diceSelected; // Just checks if you've confirmed your dice selection
@@ -40,8 +41,7 @@ public class fxDiceSelect : MonoBehaviour
         // Hides the button to roll dice before you've decided which ones you want
         rollingUI.SetActive(false);
 
-        // Players are given three d6s (worth 3 quality pts) by default, leaving them with no spare quality pts to upgrade dice.
-        qualityPointsLeft = 0;
+        // Players are given three d6s (worth 3 quality pts) by default.
         qualityPointsB = 3;
         qualityPointsW = 3;
         qualityPointsC = 3;
@@ -50,7 +50,7 @@ public class fxDiceSelect : MonoBehaviour
         foreach (GameObject element in rolledUI)
             element.SetActive(false);
 
-        // Since output[] is private, this just makes sure RollDice() knows it has 3 elements to write to
+        // Since output[] is private, this just makes sure RollDice() knows it has 3 elements to write to + a redundant value for other actions
         output = new int[4];
 
         //Adds up all points that exist in the system
@@ -201,11 +201,12 @@ public class fxDiceSelect : MonoBehaviour
 
     private IEnumerator Roll(int qualityIndex, int diceIndex)
     {
-        // diceIndex/qualityPointsX is equal to the dice value divided by two eg. diceIndex 3 corresponds to a d6
+        // diceIndex/qualityPointsX is equal to the dice value divided by two eg. a diceIndex of 3 corresponds to a d6
         // As usual, qualityIndex 0 is Bravery, 1 is Wit, 2 is Charm
         int roll;
 
-        if (zeroesAllowed)
+        // Set in-editor, this option can be toggled to do tests on balancing around lower values
+        if (zeroesAllowed) 
             roll = UnityEngine.Random.Range(0, diceIndex * 2);
         else
             roll = UnityEngine.Random.Range(1, (diceIndex * 2) + 1);

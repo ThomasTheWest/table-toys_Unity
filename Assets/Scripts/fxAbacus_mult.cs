@@ -8,7 +8,8 @@ using UnityEngine.UIElements;
 using TMPro;
 
 public class fxAbacus_mult : MonoBehaviour
-{
+{// A copy of this script is attached to each rung of the abacus and handles the positions of beads depending on what the total points value is.
+
     [Header("Arrays")]
     [SerializeField] private GameObject[] beads;
     [SerializeField] private Transform[] posForward;
@@ -103,17 +104,6 @@ public class fxAbacus_mult : MonoBehaviour
 
         for (int i = 0; i < toMove; i++) //the transform while loop is done as many times as toMove is set (which is determined by either adding or subtracting from oldValue
         {
-            /*while (elapsed < slideDuration) //this while logic was written when I assumed the interpolation value for the lerp was a duration. it doesn't work like that
-            {
-                if (ToRight)
-                    beads[indexForward].transform.position = Vector3.Lerp(beads[indexForward].transform.position, posForward[indexForward].position, elapsed / slideDuration);
-                else
-                    beads[indexForward - 1].transform.position = Vector3.Lerp(beads[indexForward - 1].transform.position, posBackward[indexForward - 1].position, elapsed / slideDuration);
-
-                elapsed += Time.deltaTime;
-                yield return null;
-            }*/
-
             if (ToRight)
                 beads[indexForward].transform.position = posForward[indexForward].position;
             else
@@ -123,10 +113,6 @@ public class fxAbacus_mult : MonoBehaviour
                 indexForward++;
             else
                 indexForward--;
-
-            //isSliding = false;
-
-            //Debug.Log("indexForward: " + indexForward);
         }
     }
 
