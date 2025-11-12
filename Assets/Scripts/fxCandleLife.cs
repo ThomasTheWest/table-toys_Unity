@@ -21,7 +21,7 @@ public class fxCandleLife : MonoBehaviour
     public Color colourCritical = new Color(1f, 0.52f, 0f);
 
     //private Color colourInitial;
-    private float intensityInitial, rangeInitial, heightInitial, flickerInitial;
+    private float rangeInitial, heightInitial;
     private float intensityCritical, rangeCritical, flickerCritical;
 
 
@@ -30,7 +30,6 @@ public class fxCandleLife : MonoBehaviour
         health = healthTotal;
         heightInitial = transform.localScale.y;
         rangeInitial = flame.range;
-        intensityInitial = flame.intensity;
 
         rangeCritical = rangeInitial / 2;
 
@@ -63,7 +62,7 @@ public class fxCandleLife : MonoBehaviour
 
         checkValue = health - damage;
 
-        if (checkValue < 0)
+        if (checkValue <= 0)
             health = 0;
         else
             health -= damage;
