@@ -102,7 +102,7 @@ public class fxAbacus_mult : MonoBehaviour
 
         //float elapsed = 0f;
 
-        for (int i = 0; i < toMove; i++) //the transform while loop is done as many times as toMove is set (which is determined by either adding or subtracting from oldValue
+        for (int i = 0; i < toMove; i++) //the transform while loop is done as many times as toMove is set (which is determined by either adding or subtracting from oldValue)
         {
             if (ToRight)
                 beads[indexForward].transform.position = posForward[indexForward].position;

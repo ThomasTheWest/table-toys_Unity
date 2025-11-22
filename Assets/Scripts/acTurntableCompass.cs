@@ -39,7 +39,7 @@ public class acTurntableCompass : MonoBehaviour
         else if (choice == 1)
         {// Swearing them in
 
-            GameObject cards = choicesUI[5]; // These are the card models. Make sure they are element 5 in the inspector!
+            GameObject cards = choicesUI[4]; // These are the card models. Make sure they are element 5 in the inspector!
 
             foreach (var renderer in cards.GetComponentsInChildren<MeshRenderer>())
             {

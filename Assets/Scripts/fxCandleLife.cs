@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.UIElements;
 
 public class fxCandleLife : MonoBehaviour
-{// This script controls the scale of a candle object that represents the player's remaining life points. Should go on the scale point for the candle, not the candlestick or candle.
+{// This script controls the scale of a candle object that represents the player's remaining life points. Should go on the scale point for the candle, not the candlestick or candle scene objects.
 
     [Header("Components")]
     [SerializeField] Light flame;
@@ -20,9 +20,7 @@ public class fxCandleLife : MonoBehaviour
     [SerializeField] int healthCritical = 3; // Dramatic lighting is triggered when you reach this health and below
     public Color colourCritical = new Color(1f, 0.52f, 0f);
 
-    //private Color colourInitial;
     private float rangeInitial, heightInitial;
-    private float intensityCritical, rangeCritical, flickerCritical;
 
 
     void Start()
@@ -70,14 +68,14 @@ public class fxCandleLife : MonoBehaviour
     }
 
     private IEnumerator DropPeg(int index)
-    {
+    {// Called when you lose an LP. Very simply finds the next peg at the top of the candle and replaces it with a physics version that falls
         Collider oldPeg;
 
         oldPeg = pegs[index].GetComponent<Collider>();
 
         oldPeg.enabled = !oldPeg.enabled;
         Instantiate(pegProp, pegs[index].transform.position, pegs[index].transform.rotation);
-        GameObject.Destroy(pegs[index].gameObject);
+        Destroy(pegs[index].gameObject);
 
         yield break;
     }
