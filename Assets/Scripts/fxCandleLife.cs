@@ -29,8 +29,6 @@ public class fxCandleLife : MonoBehaviour
         heightInitial = transform.localScale.y;
         rangeInitial = flame.range;
 
-        rangeCritical = rangeInitial / 2;
-
         flameAnimator.SetBool("started", true);
     }
 

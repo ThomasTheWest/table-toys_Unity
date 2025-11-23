@@ -1,7 +1,8 @@
 using UnityEngine;
 
 public class acSealTest : MonoBehaviour
-{
+{// For testing seal icon visibility. No real use in any gameplay prototype.
+
     [SerializeField] private Texture[] seals;
     [SerializeField] private Material mat;
     private int index;
@@ -12,7 +13,8 @@ public class acSealTest : MonoBehaviour
     }
     void Update()
     {// This does change the actual material file's properties but that's okay for the purposes of this exercise
-        mat.SetTexture("_Seal", seals[index]);    
+
+        mat.SetTexture("_Seal", seals[index]);
     }
 
     public void ProgressSeal(bool prev)
