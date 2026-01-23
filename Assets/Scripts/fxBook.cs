@@ -19,8 +19,8 @@ public class fxBook : MonoBehaviour
     [Header("Turning Pages")]
     [SerializeField] private GameObject pageForward;
     [SerializeField] private Material pageForwardFront, pageForwardBack;
-    //[SerializeField] private GameObject pageBackward;
-    //[SerializeField] private Material pageBackwardFront, pageBackwardBack;
+    [SerializeField] private GameObject pageBackward;
+    [SerializeField] private Material pageBackwardFront, pageBackwardBack;
 
     private Animator animatorForward, animatorBackward;
 
@@ -35,11 +35,11 @@ public class fxBook : MonoBehaviour
 
         // animators!
         animatorForward = pageForward.GetComponent<Animator>();
-        //animatorBackward = pageBackward.GetComponent<Animator>();
+        animatorBackward = pageBackward.GetComponent<Animator>();
 
         // Make sure those turning pages aren't visible at startup...
         pageForward.SetActive(false);
-        //pageBackward.SetActive(false);
+        pageBackward.SetActive(false);
     }
 
     public void TurnForward()
@@ -53,18 +53,20 @@ public class fxBook : MonoBehaviour
         if (index != 0 && !isTurning)
             StartCoroutine(TurnPage(true));
     }
-    private IEnumerator TurnPage(bool prev)
+    private IEnumerator TurnPage(bool back)
     {// yeah I kept the index checks in here too...oh well
 
-        int nextIndex = index + 1;
-        int prevIndex = index - 1;
-
-        if (prev && index != 0)
+        if (back && index != 0)
         {// turn page backward
-            //index -= 2; need 2 export the backwards animation tee hee
-            yield return null;
+
+            pageBackward.SetActive(true);
+            animatorBackward.SetBool("isTurning", true);
+            pageBackwardFront.mainTexture = pages[index * 2];
+            pageBackwardBack.mainTexture = pages[index * 2 - 1];
+
+            pageLeft.mainTexture = pages[(index - 1) * 2];
         }
-        else if (!prev && index + 1 != pages.Length/2) //handy way of checking if you have any more pages left based on current index
+        else if (!back && index + 1 != pages.Length/2) //handy way of checking if you have any more pages left based on current index
         {// turn page forward
             isTurning = true;
 
@@ -72,20 +74,24 @@ public class fxBook : MonoBehaviour
             pageForward.SetActive(true);
             animatorForward.SetBool("isTurning", true);
             animatorForward.Update(0f);
-            pageForwardFront.mainTexture = pages[nextIndex * 2 - 1];
-            pageForwardBack.mainTexture = pages[nextIndex * 2];
+            pageForwardFront.mainTexture = pages[(index + 1) * 2 - 1];
+            pageForwardBack.mainTexture = pages[(index + 1) * 2];
 
-            pageRight.mainTexture = pages[nextIndex * 2 + 1];
+            pageRight.mainTexture = pages[(index + 1) * 2 + 1];
         }
         else
             yield return null;
     }
 
-    public void Disappear(bool prev)
+    public void Disappear(bool back)
     {// Resets the turning page objects
-        if (prev)
+        if (back)
         {
-            return;
+            index --;
+
+            pageBackward.SetActive(false);
+            pageRight.mainTexture = pages[index * 2 + 1];
+            animatorBackward.SetBool("isTurning", false);
         }
         else
         {
@@ -93,9 +99,9 @@ public class fxBook : MonoBehaviour
 
             pageForward.SetActive(false);
             pageLeft.mainTexture = pages[index * 2];
+            animatorForward.SetBool("isTurning", false);
         }
 
-        animatorForward.SetBool("isTurning", false);
         isTurning = false;
         Debug.Log(index);
     }
