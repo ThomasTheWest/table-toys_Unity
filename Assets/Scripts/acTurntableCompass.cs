@@ -8,12 +8,15 @@ public class acTurntableCompass : MonoBehaviour
 
     [SerializeField] private GameObject[] directionsUI;
     [SerializeField] private GameObject[] choicesUI;
+    [SerializeField] private GameObject[] choices3D;
     [SerializeField] private TextMeshProUGUI monologue;
     [SerializeField] private Material matRelqua;
 
     private void Start()
     {
         foreach (GameObject choices in choicesUI)
+            choices.SetActive(false);
+        foreach (GameObject choices in choices3D)
             choices.SetActive(false);
     }
     public void DirectionPressed(int direction)
@@ -24,6 +27,8 @@ public class acTurntableCompass : MonoBehaviour
 
         foreach (GameObject choices in choicesUI)
             choices.SetActive(true);
+        foreach (GameObject choices in choices3D)
+            choices.SetActive(true);
 
         monologue.text = "You come across some starving soldiers. Too emaciated to fight, but with their alliegience unclear, you can't let them walk.";
     }
@@ -33,13 +38,16 @@ public class acTurntableCompass : MonoBehaviour
 
         if (choice == 0)
         {// Paying them off
+            GameObject moneyBag = choices3D[1];
+
+            moneyBag.SetActive(false);
 
             monologue.text = "The men take your gold and march back north behind you. Your show of mercy reflects a more human character. +1 Charm -50 Gold";
         }
         else if (choice == 1)
         {// Swearing them in
 
-            GameObject cards = choicesUI[4]; // These are the card models. Make sure they are element 5 in the inspector!
+            GameObject cards = choices3D[2]; // These are the card models. Make sure they are element 2 in the inspector!
 
             foreach (var renderer in cards.GetComponentsInChildren<MeshRenderer>())
             {
@@ -54,5 +62,8 @@ public class acTurntableCompass : MonoBehaviour
 
             monologue.text = "You hang the bodies of the soldiers by the road as you march on. It's a simple and smart message to those that might see you as a lesser leader. +1 Intelligence";
         }
+
+        foreach (GameObject choices in choicesUI)
+            choices.SetActive(false);
     }
 }

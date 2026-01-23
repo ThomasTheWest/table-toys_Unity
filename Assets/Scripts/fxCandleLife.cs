@@ -67,14 +67,18 @@ public class fxCandleLife : MonoBehaviour
 
     private IEnumerator DropPeg(int index)
     {// Called when you lose an LP. Very simply finds the next peg at the top of the candle and replaces it with a physics version that falls
-        Collider oldPeg;
 
-        oldPeg = pegs[index].GetComponent<Collider>();
+        if (health > 0)
+        {
+            Collider oldPeg;
 
-        oldPeg.enabled = !oldPeg.enabled;
-        Instantiate(pegProp, pegs[index].transform.position, pegs[index].transform.rotation);
-        Destroy(pegs[index].gameObject);
+            oldPeg = pegs[index].GetComponent<Collider>();
 
-        yield break;
+            oldPeg.enabled = !oldPeg.enabled;
+            Instantiate(pegProp, pegs[index].transform.position, pegs[index].transform.rotation);
+            Destroy(pegs[index].gameObject);
+
+            yield break;
+        }
     }
 }

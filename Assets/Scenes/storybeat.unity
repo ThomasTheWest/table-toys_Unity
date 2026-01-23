@@ -1192,6 +1192,7 @@ GameObject:
   - component: {fileID: 404838624}
   - component: {fileID: 404838623}
   - component: {fileID: 404838622}
+  - component: {fileID: 404838625}
   m_Layer: 5
   m_Name: cardText
   m_TagString: Untagged
@@ -1238,7 +1239,9 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Swear them into your army
+  m_text: 'Swear them into your army
+
+    (+2 Archers)'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 032037e490c045e42ba68202bb39874e, type: 2}
   m_sharedMaterial: {fileID: 5778795807692172721, guid: 032037e490c045e42ba68202bb39874e, type: 2}
@@ -1373,6 +1376,21 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 404838620}
   m_CullTransparentMesh: 1
+--- !u!114 &404838625
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 404838620}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 598c725fba8db5c42b74a2da04218b18, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  bgSmear: {fileID: 0}
+  fadeStartDistance: 0.125
+  fadeEndDistance: 0.25
 --- !u!1 &456002454
 GameObject:
   m_ObjectHideFlags: 0
@@ -2798,7 +2816,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 0.5, y: 0}
   m_AnchoredPosition: {x: 0, y: 83.2}
-  m_SizeDelta: {x: 537.4, y: 50}
+  m_SizeDelta: {x: 965.31, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1221084086
 MonoBehaviour:
@@ -4167,6 +4185,7 @@ GameObject:
   - component: {fileID: 2012657551}
   - component: {fileID: 2012657550}
   - component: {fileID: 2012657549}
+  - component: {fileID: 2012657552}
   m_Layer: 5
   m_Name: daggerText
   m_TagString: Untagged
@@ -4190,7 +4209,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: -76.838, y: 57.913, z: -60.844}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 33.3, y: 1.5}
+  m_AnchoredPosition: {x: 33.3, y: -0.5}
   m_SizeDelta: {x: 54.3, y: 10}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2012657549
@@ -4350,6 +4369,21 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2012657547}
   m_CullTransparentMesh: 1
+--- !u!114 &2012657552
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2012657547}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 598c725fba8db5c42b74a2da04218b18, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  bgSmear: {fileID: 0}
+  fadeStartDistance: 0.125
+  fadeEndDistance: 0.25
 --- !u!1 &2027444980
 GameObject:
   m_ObjectHideFlags: 0
@@ -4424,6 +4458,7 @@ GameObject:
   - component: {fileID: 2039301771}
   - component: {fileID: 2039301770}
   - component: {fileID: 2039301769}
+  - component: {fileID: 2039301772}
   m_Layer: 5
   m_Name: moneyText
   m_TagString: Untagged
@@ -4605,6 +4640,21 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2039301767}
   m_CullTransparentMesh: 1
+--- !u!114 &2039301772
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2039301767}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 598c725fba8db5c42b74a2da04218b18, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  bgSmear: {fileID: 0}
+  fadeStartDistance: 0.125
+  fadeEndDistance: 0.25
 --- !u!1 &2081630988
 GameObject:
   m_ObjectHideFlags: 0
@@ -4790,14 +4840,15 @@ MonoBehaviour:
   - {fileID: 137112900}
   - {fileID: 41093981}
   choicesUI:
-  - {fileID: 568687610}
   - {fileID: 2012657547}
-  - {fileID: 333361091}
   - {fileID: 2039301767}
-  - {fileID: 1261525698}
   - {fileID: 404838620}
+  choices3D:
+  - {fileID: 568687610}
+  - {fileID: 333361091}
+  - {fileID: 1261525698}
   monologue: {fileID: 1221084086}
-  matRelqua: {fileID: 0}
+  matRelqua: {fileID: 2100000, guid: b7f7513a6f3ea214d9c18e888de7a914, type: 2}
 --- !u!64 &2125330861
 MeshCollider:
   m_ObjectHideFlags: 0
