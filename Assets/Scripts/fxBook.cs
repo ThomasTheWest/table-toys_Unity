@@ -29,7 +29,7 @@ public class fxBook : MonoBehaviour
         if (pages.Length % 2 == 1)
             Debug.Log("Uh uh girlfriend...that array does NOT have an even amount of elements...");
 
-        // Makes sure that at runtime it's at the first two pages of the array  .
+        // Makes sure that at runtime it's at the first two pages of the array
         pageLeft.mainTexture = pages[index*2];
         pageRight.mainTexture = pages[index*2 + 1];
 
@@ -58,6 +58,7 @@ public class fxBook : MonoBehaviour
 
         if (back && index != 0)
         {// turn page backward
+            isTurning = true;
 
             pageBackward.SetActive(true);
             animatorBackward.SetBool("isTurning", true);
@@ -103,6 +104,6 @@ public class fxBook : MonoBehaviour
         }
 
         isTurning = false;
-        Debug.Log(index);
+        //Debug.Log(index);
     }
 }
