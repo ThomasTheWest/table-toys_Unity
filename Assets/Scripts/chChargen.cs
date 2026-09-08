@@ -9,18 +9,40 @@ using UnityEngine.SceneManagement;
 public class chChargen : MonoBehaviour
 {//Includes UI and data loading
 
-    [SerializeField] chOutfits outfitsManager;
+    public static chChargen instance;
+    
 
     [Header("Data Files")]
     CosmeticStatus cosmeticStatus;
+    string defaultCode = "ADD8E68B00005C2B24000009";//blue skin, red eyes, auburn hair, first outfit, first head, ninth sprite
+    string code;
     string filePath;
     const string fileName = "Cosmetics.json";
 
+    private int torsoIndex, headIndex, spriteIndex;
+    [HideInInspector] public Color skinColour, eyeColour, hairColour;
+
+    [Header("UI")]
+    [SerializeField] Image testImage0;
+    [SerializeField] Image testImage1;
+    [SerializeField] Image testImage2;
+    [SerializeField] Button[] buttons;
+
     public struct CosmeticStatus
     {
-        public Color skinColour;
-        public int torsoIndex;
-        public int headIndex;
+        public string characterCode;
+    }
+
+    private void Awake()
+    {
+        if (instance == null)
+        {
+            instance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
     }
 
     private void Start()
@@ -28,79 +50,154 @@ public class chChargen : MonoBehaviour
         filePath = Application.persistentDataPath;
         cosmeticStatus = new CosmeticStatus();
         Debug.Log(filePath);
-        LoadCosmeticStatus();
+        LoadCosmeticData(false);        
+
+        //Button assignment
+        buttons[0].onClick.AddListener(delegate { navigateCosmetics(true, true); });
+        buttons[1].onClick.AddListener(delegate { navigateCosmetics(true, false); });
+        buttons[2].onClick.AddListener(delegate { navigateCosmetics(false, true); });
+        buttons[3].onClick.AddListener(delegate { navigateCosmetics(false, false); });
     }
 
-    public void LoadCosmeticStatus()
-    {
-        if (File.Exists(filePath + "/" + fileName))
-        {
-            string loadedJson = File.ReadAllText(filePath + "/" + fileName);
+    public void LoadCosmeticData(bool loadDefaults)
+    {//If loading defaults, it saves them at the same time
 
-            cosmeticStatus = JsonUtility.FromJson<CosmeticStatus>(loadedJson);
-            Debug.Log("Cosmetic Info found, loading");
+        string loadedJson = File.ReadAllText(filePath + "/" + fileName);
+
+        cosmeticStatus = JsonUtility.FromJson<CosmeticStatus>(loadedJson);
+        code = cosmeticStatus.characterCode;
+
+        if (!loadDefaults)
+        {
+            if (File.Exists(filePath + "/" + fileName))
+            {
+                if (code.Length < 24)
+                {
+                    code = defaultCode;
+                    Debug.Log("Cosmetic code length invalid. Loading default values");
+                }
+                else
+                    Debug.Log("Cosmetic info found, loading " + code);
+            }
+            else
+            {
+                code = defaultCode;
+                Debug.Log("Cosmetic info not found. Loading default values");
+            }
         }
         else
         {
-            cosmeticStatus.skinColour = new Vector4(0f, 0f, 0f);
-            cosmeticStatus.torsoIndex = 0;
-            cosmeticStatus.headIndex = 0;
-            Debug.Log("Cosmetic Info not found. Switching to default values");
+            code = defaultCode;
+
+            string cosmeticStatusJson = JsonUtility.ToJson(cosmeticStatus);
+            File.WriteAllText(filePath + "/" + fileName, cosmeticStatusJson);
+            Debug.Log("Cosmetics saved");
         }
 
-        outfitsManager.loadTorso(cosmeticStatus.torsoIndex);
-        outfitsManager.loadHead(cosmeticStatus.headIndex);
-        //outfitsManager.loadSkintone(cosmeticStatus.skinColour);
+        //Turns whatever was loaded from the above function into variables for the script
+        string skinColourSubstring = code.Substring(0, 6);
+        ColorUtility.TryParseHtmlString("#" + skinColourSubstring, out skinColour);
+
+        string eyeColourSubstring = code.Substring(6, 6);
+        ColorUtility.TryParseHtmlString("#" + eyeColourSubstring, out eyeColour);
+
+        string hairColourSubstring = code.Substring(12, 6);
+        ColorUtility.TryParseHtmlString("#" + hairColourSubstring, out hairColour);
+
+        string torsoIndexSubstring = code.Substring(18, 2);
+        torsoIndex = Int32.Parse(torsoIndexSubstring);
+
+        string headIndexSubstring = code.Substring(20, 2);
+        headIndex = Int32.Parse(headIndexSubstring);
+
+        string spriteIndexSubstring = code.Substring(22, 2);
+        spriteIndex = Int32.Parse(spriteIndexSubstring);
+
+        testImage0.color = skinColour;
+        Debug.Log(skinColour + " " + skinColourSubstring);
+        testImage1.color = eyeColour;
+        Debug.Log(eyeColour + " " + eyeColourSubstring);
+        testImage2.color = hairColour;
+        Debug.Log(hairColour + " " + hairColourSubstring);
+
+        chOutfits.instance.loadTorso(torsoIndex);
+        chOutfits.instance.loadHead(headIndex);
     }
 
-    public void SaveGameStatus()
+    public void SaveCosmeticStatus()
     {
+        //Turns the edited ints into substrings to be reabsorbed back into the Big String
+        string skinColourSubstring = ColorUtility.ToHtmlStringRGB(skinColour);
+
+        string eyeColourSubstring = ColorUtility.ToHtmlStringRGB(eyeColour);
+
+        string hairColourSubstring = ColorUtility.ToHtmlStringRGB(hairColour);
+
+        string torsoIndexSubstring = torsoIndex.ToString();
+        if (torsoIndexSubstring.Length == 1)
+            torsoIndexSubstring = "0" + torsoIndexSubstring;
+
+        string headIndexSubstring = headIndex.ToString();
+        if (headIndexSubstring.Length == 1)
+            headIndexSubstring = "0" + headIndexSubstring;
+
+        string spriteIndexSubstring = headIndex.ToString();
+        if (spriteIndexSubstring.Length == 1)
+            spriteIndexSubstring = "0" + spriteIndexSubstring;
+
+        cosmeticStatus.characterCode = skinColourSubstring + eyeColourSubstring + hairColourSubstring + torsoIndexSubstring + headIndexSubstring + spriteIndexSubstring;
+        Debug.Log(cosmeticStatus.characterCode);
+
         string cosmeticStatusJson = JsonUtility.ToJson(cosmeticStatus);
         File.WriteAllText(filePath + "/" + fileName, cosmeticStatusJson);
         Debug.Log("Cosmetics saved");
     }
-    
-    public void navigateTorsos(bool forwards)
-    {
-        int torsoAmount = outfitsManager.torsoAmount();// This is so if more cosmetics are added to the outfits manager script, nothing needs to be changed here
 
-        if (forwards)
+    void navigateCosmetics(bool forwards, bool isHead)
+    {//A ui element, should probably move this to a manager 
+
+        int torsoAmount = chOutfits.instance.torsoAmount();// This is so if more cosmetics are added to the outfits manager script, nothing needs to be changed here
+        int headAmount = chOutfits.instance.headAmount();
+
+        if (isHead)
         {
-            if (cosmeticStatus.torsoIndex == torsoAmount - 1)
-                cosmeticStatus.torsoIndex = 0;
+            if (forwards)
+            {
+                if (headIndex == headAmount - 1)
+                    headIndex = 0;
+                else
+                    headIndex++;
+            }
             else
-                cosmeticStatus.torsoIndex++;
+            {
+                if (headIndex == 0)
+                    headIndex = headAmount - 1;
+                else
+                    headIndex--;
+            }
+
+            chOutfits.instance.loadHead(headIndex);
+
         }
         else
         {
-            if (cosmeticStatus.torsoIndex == 0)
-                cosmeticStatus.torsoIndex = torsoAmount - 1;
+            if (forwards)
+            {
+                if (torsoIndex == torsoAmount - 1)
+                    torsoIndex = 0;
+                else
+                    torsoIndex++;
+            }
             else
-                cosmeticStatus.torsoIndex--;
+            {
+                if (torsoIndex == 0)
+                    torsoIndex = torsoAmount - 1;
+                else
+                    torsoIndex--;
+            }
+
+            chOutfits.instance.loadTorso(torsoIndex);
+
         }
-
-        outfitsManager.loadTorso(cosmeticStatus.torsoIndex);
-    }
-
-    public void navigateHeads(bool forwards)
-    {
-        int headAmount = outfitsManager.headAmount();
-
-        if (forwards)
-        {
-            if (cosmeticStatus.headIndex == headAmount - 1)
-                cosmeticStatus.headIndex = 0;
-            else
-                cosmeticStatus.headIndex++;
-        }
-        else
-        {
-            if (cosmeticStatus.headIndex == 0)
-                cosmeticStatus.headIndex = headAmount - 1;
-            else
-                cosmeticStatus.headIndex--;
-        }
-
-        outfitsManager.loadHead(cosmeticStatus.headIndex);
     }
 }
