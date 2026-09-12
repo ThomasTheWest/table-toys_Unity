@@ -1,10 +1,12 @@
-using UnityEngine;
-using UnityEngine.UI;
 using System;
-using System.IO;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
+using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
+using ColorPicker;
 
 public class chChargen : MonoBehaviour
 {//Includes UI and data loading
@@ -23,10 +25,14 @@ public class chChargen : MonoBehaviour
     [HideInInspector] public Color skinColour, eyeColour, hairColour;
 
     [Header("UI")]
-    [SerializeField] Image testImage0;
-    [SerializeField] Image testImage1;
-    [SerializeField] Image testImage2;
-    [SerializeField] Button[] buttons;
+    [SerializeField] private Image testImage0;
+    [SerializeField] private Image testImage1;
+    [SerializeField] private Image testImage2;
+    [SerializeField] private Button[] buttons;
+
+    [SerializeField] private GameObject[] colourPickers;
+    private ColorPicker.ColorPicker activePicker;
+    private int oldPicker = 3;
 
     public struct CosmeticStatus
     {
@@ -57,6 +63,21 @@ public class chChargen : MonoBehaviour
         buttons[1].onClick.AddListener(delegate { navigateCosmetics(true, false); });
         buttons[2].onClick.AddListener(delegate { navigateCosmetics(false, true); });
         buttons[3].onClick.AddListener(delegate { navigateCosmetics(false, false); });
+    }
+
+    private void Update()
+    {
+        if (oldPicker < 3)
+        {
+            chOutfits.instance.ChangeColour(activePicker.type, activePicker.CurrentSelectedColor);
+
+            if (oldPicker == 0)
+                testImage0.color = skinColour;
+            else if (oldPicker == 1)    
+                testImage1.color = eyeColour;
+            else if (oldPicker == 2)
+                testImage2.color = hairColour;
+        }
     }
 
     public void LoadCosmeticData(bool loadDefaults)
@@ -91,7 +112,7 @@ public class chChargen : MonoBehaviour
 
             string cosmeticStatusJson = JsonUtility.ToJson(cosmeticStatus);
             File.WriteAllText(filePath + "/" + fileName, cosmeticStatusJson);
-            Debug.Log("Cosmetics saved");
+            Debug.Log("Defaults loaded & preferences overwritten");
         }
 
         //Turns whatever was loaded from the above function into variables for the script
@@ -114,11 +135,11 @@ public class chChargen : MonoBehaviour
         spriteIndex = Int32.Parse(spriteIndexSubstring);
 
         testImage0.color = skinColour;
-        Debug.Log(skinColour + " " + skinColourSubstring);
+        //Debug.Log(skinColour + " " + skinColourSubstring);
         testImage1.color = eyeColour;
-        Debug.Log(eyeColour + " " + eyeColourSubstring);
+        //Debug.Log(eyeColour + " " + eyeColourSubstring);
         testImage2.color = hairColour;
-        Debug.Log(hairColour + " " + hairColourSubstring);
+        //Debug.Log(hairColour + " " + hairColourSubstring);
 
         chOutfits.instance.loadTorso(torsoIndex);
         chOutfits.instance.loadHead(headIndex);
@@ -153,8 +174,9 @@ public class chChargen : MonoBehaviour
         Debug.Log("Cosmetics saved");
     }
 
-    void navigateCosmetics(bool forwards, bool isHead)
-    {//A ui element, should probably move this to a manager 
+    //UI functions, should probably move this to a dedicated manager 
+    public void navigateCosmetics(bool forwards, bool isHead)
+    {
 
         int torsoAmount = chOutfits.instance.torsoAmount();// This is so if more cosmetics are added to the outfits manager script, nothing needs to be changed here
         int headAmount = chOutfits.instance.headAmount();
@@ -198,6 +220,46 @@ public class chChargen : MonoBehaviour
 
             chOutfits.instance.loadTorso(torsoIndex);
 
+        }
+    }
+
+    public void ToggleColourPicker(int type)//0 for skin, 1 for eyes, 2 for hair
+    {
+        if (oldPicker == type)
+        {
+            colourPickers[type].SetActive(false);
+            activePicker = null;
+            oldPicker = 3;
+        }
+            
+        else
+        {
+            colourPickers[type].SetActive(true);
+            activePicker = colourPickers[type].GetComponent<ColorPicker.ColorPicker>();
+            oldPicker = type;
+        }
+
+
+        if (type == 0)
+        {
+            colourPickers[1].SetActive(false);
+            colourPickers[2].SetActive(false);
+        }
+        else if (type == 1)
+        {
+            colourPickers[0].SetActive(false);
+            colourPickers[2].SetActive(false);
+        }
+        else if (type == 2)
+        {
+            colourPickers[0].SetActive(false);
+            colourPickers[1].SetActive(false);
+        }
+        else
+        {
+            colourPickers[0].SetActive(false);
+            colourPickers[1].SetActive(false);
+            colourPickers[2].SetActive(false);
         }
     }
 }

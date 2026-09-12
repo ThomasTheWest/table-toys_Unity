@@ -7,10 +7,13 @@ namespace ColorPicker
 {
     public class ColorPicker : MonoBehaviour, IPointerClickHandler
     {
+        public int type;
+        
         private static readonly Color DefaultColor = new(1, 1, 1, 0);
         private static readonly Vector2 CenterPivot = new(0.5f, 0.5f);
 
         public event Action<Color> ColorSelectionChanged;
+
         public Color CurrentSelectedColor { get; private set; } = DefaultColor;
 
         [SerializeField] private Image _paletteImage;
